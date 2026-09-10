@@ -42,7 +42,7 @@ const WORKSHOPS = [
     {
         key: 'portrait',
         name: 'Oil Portraiture',
-        query: 'portrait oil',
+        query: 'portrait',
         tag: 'Figure',
         blurb: 'Structure under the skin — planes, value, and the patience of a slow build.',
         focus: 'Value & structure',
@@ -61,7 +61,7 @@ const WORKSHOPS = [
     {
         key: 'charcoal',
         name: 'Charcoal Sketching',
-        query: 'charcoal drawing',
+        query: 'charcoal',
         tag: 'Dry media',
         blurb: 'Value first, edges second. The fastest way to find out what you actually see.',
         focus: 'Seeing & rendering',
@@ -118,7 +118,7 @@ const WORKSHOPS = [
     {
         key: 'figure',
         name: 'Life Drawing',
-        query: 'figure study',
+        query: 'figure drawing',
         tag: 'Gesture',
         blurb: 'Thirty seconds to catch a whole body. Then thirty more, and thirty more.',
         focus: 'Gesture & weight',
@@ -241,8 +241,27 @@ function variationIcon(key) {
 }
 
 /* ============================================================
-   ART APIs — pull works from open archives
+   ART APIs — Cleveland first (direct image URLs, reliable),
+   Art Institute of Chicago as backup.
    ============================================================ */
+async function searchCMA(query, limit = 10) {
+    const url = `${CMA_SEARCH}?q=${encodeURIComponent(query)}&limit=${limit}&has_image=1`;
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(`CMA search failed (${res.status})`);
+    const json = await res.json();
+    return (json.data || []).filter(
+        c => c.images && c.images.web && c.images.web.url
+    );
+}
+
+function cmaCreditLine(c) {
+    const creator = c.creators && c.creators[0] ? c.creators[0].description : '';
+    const bits = [creator, c.creation_date, c.type]
+        .filter(Boolean)
+        .map(s => String(s).trim());
+    return bits.join(' · ');
+}
+
 async function searchAIC(query, limit = 10) {
     const url = `${AIC_SEARCH}?q=${encodeURIComponent(query)}&limit=${limit}&fields=${FIELDS}`;
     const res = await fetch(url, { headers: { Accept: 'application/json' } });
@@ -263,25 +282,25 @@ function aicCreditLine(a) {
     return bits.join(' · ');
 }
 
-async function searchCMA(query, limit = 5) {
-    const url = `${CMA_SEARCH}?q=${encodeURIComponent(query)}&limit=${limit}&has_image=1`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) throw new Error(`CMA search failed (${res.status})`);
-    const json = await res.json();
-    return (json.data || []).filter(
-        c => c.images && c.images.web && c.images.web.url
-    );
-}
-
-function cmaCreditLine(c) {
-    const creator = c.creators && c.creators[0] ? c.creators[0].description : '';
-    const bits = [creator, c.creation_date, c.type]
-        .filter(Boolean)
-        .map(s => String(s).trim());
-    return bits.join(' · ');
-}
-
+/* ---------- Unified fetch — Cleveland primary, AIC fallback ---------- */
 async function fetchArtwork(query) {
+    // 1) Cleveland Museum of Art — direct image URLs, always load
+    try {
+        const results = await searchCMA(query, 10);
+        if (results.length) {
+            const pick = results[Math.floor(Math.random() * results.length)];
+            return {
+                source: 'cma',
+                title: pick.title || 'Untitled',
+                credit: cmaCreditLine(pick),
+                image: pick.images.web.url
+            };
+        }
+    } catch (err) {
+        console.warn('CMA search failed, trying AIC.', err);
+    }
+
+    // 2) Art Institute of Chicago — fallback
     try {
         const results = await searchAIC(query, 10);
         if (results.length) {
@@ -294,22 +313,7 @@ async function fetchArtwork(query) {
             };
         }
     } catch (err) {
-        console.warn('AIC search failed, falling back to Cleveland.', err);
-    }
-
-    try {
-        const results = await searchCMA(query, 5);
-        if (results.length) {
-            const pick = results[Math.floor(Math.random() * results.length)];
-            return {
-                source: 'cma',
-                title: pick.title || 'Untitled',
-                credit: cmaCreditLine(pick),
-                image: pick.images.web.url
-            };
-        }
-    } catch (err) {
-        console.warn('CMA fallback failed.', err);
+        console.warn('AIC fallback failed too.', err);
     }
 
     throw new Error('No works found from either source');
@@ -337,6 +341,15 @@ function loadInto(mediaEl, imgEl, url, alt) {
             reject(new Error('Image failed to load'));
         };
         pre.src = url;
+
+        // Give up after 12 seconds so a dead endpoint doesn't freeze the hero
+        setTimeout(() => {
+            if (!pre.complete) {
+                pre.src = '';
+                mediaEl.classList.remove('is-loading');
+                reject(new Error('Image timed out'));
+            }
+        }, 12000);
     });
 }
 
@@ -377,6 +390,39 @@ function initHome() {
     initLightbox();
 }
 
+/* ---- Build a pool of reliable artworks for the hero ---- */
+async function buildHeroPool() {
+    // Cleveland first — direct URLs, always load
+    try {
+        const cma = await searchCMA('painting', 15);
+        if (cma.length) {
+            return cma.map(c => ({
+                title: c.title || 'Untitled',
+                credit: cmaCreditLine(c),
+                image: c.images.web.url
+            }));
+        }
+    } catch (e) {
+        console.warn('CMA hero pool failed, trying AIC.', e);
+    }
+
+    // AIC fallback
+    try {
+        const aic = await searchAIC('painting', 15);
+        if (aic.length) {
+            return aic.map(a => ({
+                title: a.title || 'Untitled',
+                credit: aicCreditLine(a),
+                image: aicImageUrl(a.image_id, 1000)
+            }));
+        }
+    } catch (e) {
+        console.warn('AIC hero pool failed too.', e);
+    }
+
+    return [];
+}
+
 async function initHeroRotation() {
     const media = $('#heroMedia');
     const img = $('#heroImage');
@@ -385,16 +431,13 @@ async function initHeroRotation() {
 
     if (!media || !img) return;
 
-    let pool = [];
-    try {
-        pool = await searchAIC('painting', 12);
-    } catch (err) {
+    const pool = await buildHeroPool();
+
+    if (!pool.length) {
         titleEl.textContent = 'Archive unavailable';
         metaEl.textContent = 'Check your connection and refresh.';
         return;
     }
-
-    if (!pool.length) return;
 
     let index = 0;
 
@@ -404,22 +447,35 @@ async function initHeroRotation() {
             await new Promise(r => setTimeout(r, 420));
         }
         try {
-            await loadInto(media, img, aicImageUrl(artwork.image_id, 1000), artwork.title || 'Artwork');
-            titleEl.textContent = artwork.title || 'Untitled';
-            metaEl.textContent = aicCreditLine(artwork);
+            await loadInto(media, img, artwork.image, artwork.title);
+            titleEl.textContent = artwork.title;
+            metaEl.textContent = artwork.credit;
+            return true;
         } catch (err) {
-            console.warn('Hero image failed, skipping.', err);
+            return false;
         }
     };
 
-    await show(pool[0], false);
-
-    setInterval(() => {
+    // Initial — try up to every work in the pool until one loads
+    let tries = 0;
+    while (tries < pool.length && !(await show(pool[index], false))) {
         index = (index + 1) % pool.length;
-        show(pool[index], true);
+        tries++;
+    }
+
+    // Rotate — skip any that fail to load
+    setInterval(async () => {
+        let attempts = 0;
+        let shown = false;
+        while (attempts < pool.length && !shown) {
+            index = (index + 1) % pool.length;
+            shown = await show(pool[index], true);
+            attempts++;
+        }
     }, 7000);
 }
 
+/* ---- Today's inspiration ---- */
 async function initTodayInspiration() {
     const media = $('#todayMedia');
     const img = $('#todayImage');
@@ -434,17 +490,23 @@ async function initTodayInspiration() {
         metaEl.textContent = '';
         if (refreshBtn) refreshBtn.classList.add('is-loading');
 
-        try {
-            const art = await fetchArtwork('painting drawing');
-            await loadInto(media, img, art.image, art.title);
-            titleEl.textContent = art.title;
-            metaEl.textContent = art.credit;
-        } catch (err) {
-            titleEl.textContent = 'Could not reach the archive';
-            metaEl.textContent = 'The archive API may be briefly unavailable.';
-        } finally {
-            if (refreshBtn) refreshBtn.classList.remove('is-loading');
+        // Try up to 3 times with fresh picks before giving up
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                const art = await fetchArtwork('painting');
+                await loadInto(media, img, art.image, art.title);
+                titleEl.textContent = art.title;
+                metaEl.textContent = art.credit;
+                if (refreshBtn) refreshBtn.classList.remove('is-loading');
+                return;
+            } catch (err) {
+                console.warn(`Today attempt ${attempt + 1} failed.`, err);
+            }
         }
+
+        titleEl.textContent = 'Could not reach the archive';
+        metaEl.textContent = 'Please try again in a moment.';
+        if (refreshBtn) refreshBtn.classList.remove('is-loading');
     }
 
     load();
@@ -533,17 +595,23 @@ async function openLightbox(key) {
     const closeBtn = $('.lightbox__close', lightboxEl);
     if (closeBtn) closeBtn.focus();
 
-    try {
-        const art = await fetchArtwork(w.query);
-        await loadInto(lbMedia, lbImg, art.image, art.title);
-        lbTitle.textContent = art.title;
-        lbMeta.textContent = art.credit;
-    } catch (err) {
-        lbTitle.textContent = 'Could not load a work';
-        lbMeta.textContent = 'The archive API may be briefly unavailable.';
-    } finally {
-        if (lbSpinner) lbSpinner.style.display = 'none';
+    // Try up to 3 times with fresh picks
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            const art = await fetchArtwork(w.query);
+            await loadInto(lbMedia, lbImg, art.image, art.title);
+            lbTitle.textContent = art.title;
+            lbMeta.textContent = art.credit;
+            if (lbSpinner) lbSpinner.style.display = 'none';
+            return;
+        } catch (err) {
+            console.warn(`Lightbox attempt ${attempt + 1} failed.`, err);
+        }
     }
+
+    lbTitle.textContent = 'Could not load a work';
+    lbMeta.textContent = 'Please try again in a moment.';
+    if (lbSpinner) lbSpinner.style.display = 'none';
 }
 
 function closeLightbox() {
@@ -803,7 +871,6 @@ function validateForm(form) {
     return ok;
 }
 
-/* ---- Reminder ID ---- */
 function makeRegistrationId() {
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -813,7 +880,6 @@ function makeRegistrationId() {
     return `LL-${yyyy}-${mm}${dd}-${rand}`;
 }
 
-/* ---- Submit ---- */
 async function handleSubmit(e) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -891,7 +957,6 @@ async function handleSubmit(e) {
     }
 }
 
-/* ---- EmailJS delivery ---- */
 async function sendReminderEmail(p) {
     const configured =
         window.emailjs &&
@@ -966,7 +1031,6 @@ function buildPlainMessage(p) {
     ].join('\n');
 }
 
-/* ---- Success / error ---- */
 function showSuccess(p) {
     const box = $('#formMessage');
     const title = $('#formMessageTitle');
@@ -1000,7 +1064,6 @@ function showError(err) {
     box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-/* ---- Local storage ---- */
 function readReminders() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -1104,7 +1167,6 @@ function renderDashboard() {
     });
 }
 
-/* ---- Date formatting ---- */
 function formatDateLong(iso) {
     if (!iso) return '';
     const d = new Date(`${iso}T00:00:00`);
