@@ -9,12 +9,30 @@ const AIC_IIIF   = 'https://www.artic.edu/iiif/2/';
 const CMA_SEARCH = 'https://openaccess-api.clevelandart.org/api/artworks/';
 const FIELDS     = 'id,title,image_id,artist_display,date_display,medium_display';
 
-/* EmailJS — replace with your own from https://dashboard.emailjs.com */
+/* ---------- EmailJS ----------
+   publicKey   — your key (already filled in)
+   serviceId   — get this from EmailJS → Email Services
+   templateId  — get this from EmailJS → Email Templates
+-------------------------------- */
 const EMAILJS = {
-    publicKey:  'YOUR_PUBLIC_KEY',
+    publicKey:  'cIeRGuB2mD_8X6NQD',
     serviceId:  'YOUR_SERVICE_ID',
     templateId: 'YOUR_TEMPLATE_ID'
 };
+
+/* Initialise EmailJS once, as soon as the library loads */
+(function initEmailJS() {
+    if (window.emailjs && EMAILJS.publicKey && EMAILJS.publicKey !== 'YOUR_PUBLIC_KEY') {
+        try {
+            emailjs.init({ publicKey: EMAILJS.publicKey });
+            console.info('[The Long Look] EmailJS initialised.');
+        } catch (err) {
+            console.warn('[The Long Look] EmailJS init failed.', err);
+        }
+    } else {
+        console.info('[The Long Look] EmailJS not ready — waiting for DOMContentLoaded.');
+    }
+})();
 
 const STORAGE_KEY = 'll_reminders_v1';
 
@@ -154,7 +172,7 @@ function workshopByKey(key) {
 }
 
 /* ============================================================
-   MATERIAL ICONS — small stroke-based SVGs by keyword
+   MATERIAL ICONS
    ============================================================ */
 const MATERIAL_ICONS = {
     brush: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>',
@@ -192,7 +210,7 @@ function materialIcon(text) {
 }
 
 /* ============================================================
-   ART APIs — Cleveland first (reliable direct URLs), AIC fallback
+   ART APIs — Cleveland first, AIC fallback
    ============================================================ */
 async function searchCMA(query, limit = 10) {
     const url = `${CMA_SEARCH}?q=${encodeURIComponent(query)}&limit=${limit}&has_image=1`;
@@ -232,7 +250,6 @@ function aicCreditLine(a) {
     return bits.join(' · ');
 }
 
-/* ---------- Unified fetch — Cleveland primary, AIC fallback ---------- */
 async function fetchArtwork(query) {
     try {
         const results = await searchCMA(query, 10);
@@ -290,7 +307,6 @@ function loadInto(mediaEl, imgEl, url, alt) {
         };
         pre.src = url;
 
-        // Give up after 12 seconds so a dead endpoint doesn't freeze the hero
         setTimeout(() => {
             if (!pre.complete) {
                 pre.src = '';
@@ -401,14 +417,12 @@ async function initHeroRotation() {
         }
     };
 
-    // Initial — try up to every work in the pool until one loads
     let tries = 0;
     while (tries < pool.length && !(await show(pool[index], false))) {
         index = (index + 1) % pool.length;
         tries++;
     }
 
-    // Rotate — skip any that fail to load
     setInterval(async () => {
         let attempts = 0;
         let shown = false;
@@ -493,7 +507,6 @@ function renderWorkshopGrid() {
     });
 }
 
-/* ---- Lightbox ---- */
 let lightboxEl, lbMedia, lbImg, lbTitle, lbMeta, lbWorkshop, lbRegister, lbSpinner, lastFocus;
 
 function initLightbox() {
@@ -735,7 +748,6 @@ function updatePreviewMaterials() {
   `).join('');
 }
 
-/* ---- Update the LIVE PREVIEW panel (real artwork image) ---- */
 let previewRequestId = 0;
 
 async function updatePreviewVariation(key) {
@@ -932,12 +944,14 @@ async function handleSubmit(e) {
 async function sendReminderEmail(p) {
     const configured =
         window.emailjs &&
+        EMAILJS.publicKey  &&
         EMAILJS.publicKey  !== 'YOUR_PUBLIC_KEY' &&
         EMAILJS.serviceId  !== 'YOUR_SERVICE_ID' &&
         EMAILJS.templateId !== 'YOUR_TEMPLATE_ID';
 
     if (!configured) {
-        console.info('[The Long Look] EmailJS not configured. Simulating send.');
+        console.info('[The Long Look] EmailJS not fully configured. Simulating send.');
+        console.info('Add your serviceId + templateId to enable real delivery.');
         console.info('Payload that would be emailed:', p);
         await new Promise(r => setTimeout(r, 900));
         return { status: 'simulated' };
@@ -1155,6 +1169,11 @@ function formatDateLong(iso) {
    BOOT
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
+    // Re-run init once the library is definitely available
+    if (window.emailjs && EMAILJS.publicKey && EMAILJS.publicKey !== 'YOUR_PUBLIC_KEY') {
+        try { emailjs.init({ publicKey: EMAILJS.publicKey }); } catch (e) {}
+    }
+
     initNav();
 
     const page = document.body.dataset.page;
