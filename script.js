@@ -1056,4 +1056,108 @@ function writeReminders(arr) {
 
 function saveReminder(p) {
     const arr = readReminders();
-    arr.push
+    arr.push({
+        id: p.registrationId,
+        name: p.name,
+        email: p.email,
+        workshopKey: p.workshopKey,
+        workshopName: p.workshopName,
+        sessionDate: p.sessionDate,
+        sessionTime: p.sessionTime,
+        skillLevel: p.skillLevel,
+        repeat: p.repeat,
+        focus: p.focus,
+        materials: p.materials,
+        artworkTitle: p.artworkTitle,
+        artworkCredit: p.artworkCredit,
+        artworkImage: p.artworkImage,
+        createdAt: p.createdAt
+    });
+    writeReminders(arr);
+}
+
+function deleteReminder(id) {
+    writeReminders(readReminders().filter(r => r.id !== id));
+    renderDashboard();
+}
+
+function renderDashboard() {
+    const list = $('#reminderList');
+    const empty = $('#reminderEmpty');
+    const count = $('#reminderCount');
+    if (!list) return;
+
+    const reminders = readReminders().sort((a, b) => {
+        const da = new Date(`${a.sessionDate}T${a.sessionTime || '00:00'}`);
+        const db = new Date(`${b.sessionDate}T${b.sessionTime || '00:00'}`);
+        return da - db;
+    });
+
+    if (count) {
+        count.textContent = reminders.length === 1
+            ? '1 reminder'
+            : `${reminders.length} reminders`;
+    }
+
+    if (!reminders.length) {
+        list.innerHTML = '';
+        if (empty) empty.hidden = false;
+        return;
+    }
+
+    if (empty) empty.hidden = true;
+
+    list.innerHTML = reminders.map(r => {
+        const w = workshopByKey(r.workshopKey);
+        const thumb = r.artworkImage
+            ? `<img src="${escapeHtml(r.artworkImage)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+            : '';
+
+        return `
+      <article class="reminder">
+        <div class="reminder__thumb" style="background:${w.swatch}">
+          <span class="reminder__badge">${escapeHtml(w.tag)}</span>
+          ${thumb}
+        </div>
+
+        <div class="reminder__body">
+          <p class="reminder__when">${escapeHtml(formatDateLong(r.sessionDate))} · ${escapeHtml(r.sessionTime || '')}</p>
+          <p class="reminder__what">${escapeHtml(r.workshopName)}</p>
+          <p class="reminder__art">${escapeHtml(r.artworkTitle || 'Work pending')}</p>
+
+          <div class="reminder__foot">
+            <span class="reminder__id">${escapeHtml(r.id)}</span>
+            <button class="reminder__del" type="button" data-delete="${escapeHtml(r.id)}">Remove</button>
+          </div>
+        </div>
+      </article>
+    `;
+    }).join('');
+
+    $$('[data-delete]', list).forEach(btn => {
+        btn.addEventListener('click', () => deleteReminder(btn.dataset.delete));
+    });
+}
+
+function formatDateLong(iso) {
+    if (!iso) return '';
+    const d = new Date(`${iso}T00:00:00`);
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString(undefined, {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    initNav();
+
+    const page = document.body.dataset.page;
+    if (page === 'home')     initHome();
+    if (page === 'schedule') initSchedule();
+});
