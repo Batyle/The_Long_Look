@@ -154,7 +154,7 @@ function workshopByKey(key) {
 }
 
 /* ============================================================
-   ICONS — small (material) and large (variation hero)
+   MATERIAL ICONS — small stroke-based SVGs by keyword
    ============================================================ */
 const MATERIAL_ICONS = {
     brush: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>',
@@ -191,58 +191,8 @@ function materialIcon(text) {
     return MATERIAL_ICONS.dot;
 }
 
-/* ---------- LARGE VARIATION HERO ICONS (64×64) ---------- */
-const VARIATION_ICONS = {
-    watercolor: `
-    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M22 46c0-6 6-11 6-18a6 6 0 0 1 12 0c0 7 6 12 6 18a12 12 0 0 1-24 0z"/>
-      <path d="M14 22c3-3 6-3 9 0M44 18c3-3 6-3 9 0"/>
-      <circle cx="14" cy="14" r="2"/>
-      <circle cx="52" cy="30" r="1.6"/>
-    </svg>`,
-    portrait: `
-    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="32" cy="24" r="11"/>
-      <path d="M11 56c2-11 10-17 21-17s19 6 21 17"/>
-      <path d="M26 22c1.5-2 5-2 6 0M32 22c1.5-2 5-2 6 0"/>
-    </svg>`,
-    charcoal: `
-    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M40 8L56 24 22 58 6 42z"/>
-      <path d="M6 42l8 8M22 58l-8-8"/>
-      <path d="M32 16l16 16"/>
-    </svg>`,
-    abstract: `
-    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M10 40c0-14 8-26 22-26s22 12 22 26-10 16-22 16S10 54 10 40z"/>
-      <circle cx="24" cy="30" r="5"/>
-      <path d="M32 20v20M20 46h24"/>
-    </svg>`,
-    printmaking: `
-    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="8" y="10" width="48" height="14" rx="3"/>
-      <path d="M32 24v10"/>
-      <rect x="22" y="34" width="20" height="10" rx="2"/>
-      <path d="M32 44v14"/>
-      <path d="M14 17h36"/>
-    </svg>`,
-    figure: `
-    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="34" cy="12" r="5"/>
-      <path d="M34 17v14"/>
-      <path d="M34 24l-12 6M34 24l12 4"/>
-      <path d="M34 31l-6 18M34 31l8 18"/>
-      <path d="M14 54l14-4M50 54l-14-4"/>
-    </svg>`
-};
-
-function variationIcon(key) {
-    return VARIATION_ICONS[key] || VARIATION_ICONS.abstract;
-}
-
 /* ============================================================
-   ART APIs — Cleveland first (direct image URLs, reliable),
-   Art Institute of Chicago as backup.
+   ART APIs — Cleveland first (reliable direct URLs), AIC fallback
    ============================================================ */
 async function searchCMA(query, limit = 10) {
     const url = `${CMA_SEARCH}?q=${encodeURIComponent(query)}&limit=${limit}&has_image=1`;
@@ -284,7 +234,6 @@ function aicCreditLine(a) {
 
 /* ---------- Unified fetch — Cleveland primary, AIC fallback ---------- */
 async function fetchArtwork(query) {
-    // 1) Cleveland Museum of Art — direct image URLs, always load
     try {
         const results = await searchCMA(query, 10);
         if (results.length) {
@@ -300,7 +249,6 @@ async function fetchArtwork(query) {
         console.warn('CMA search failed, trying AIC.', err);
     }
 
-    // 2) Art Institute of Chicago — fallback
     try {
         const results = await searchAIC(query, 10);
         if (results.length) {
@@ -390,9 +338,7 @@ function initHome() {
     initLightbox();
 }
 
-/* ---- Build a pool of reliable artworks for the hero ---- */
 async function buildHeroPool() {
-    // Cleveland first — direct URLs, always load
     try {
         const cma = await searchCMA('painting', 15);
         if (cma.length) {
@@ -406,7 +352,6 @@ async function buildHeroPool() {
         console.warn('CMA hero pool failed, trying AIC.', e);
     }
 
-    // AIC fallback
     try {
         const aic = await searchAIC('painting', 15);
         if (aic.length) {
@@ -475,7 +420,6 @@ async function initHeroRotation() {
     }, 7000);
 }
 
-/* ---- Today's inspiration ---- */
 async function initTodayInspiration() {
     const media = $('#todayMedia');
     const img = $('#todayImage');
@@ -490,7 +434,6 @@ async function initTodayInspiration() {
         metaEl.textContent = '';
         if (refreshBtn) refreshBtn.classList.add('is-loading');
 
-        // Try up to 3 times with fresh picks before giving up
         for (let attempt = 0; attempt < 3; attempt++) {
             try {
                 const art = await fetchArtwork('painting');
@@ -595,7 +538,6 @@ async function openLightbox(key) {
     const closeBtn = $('.lightbox__close', lightboxEl);
     if (closeBtn) closeBtn.focus();
 
-    // Try up to 3 times with fresh picks
     for (let attempt = 0; attempt < 3; attempt++) {
         try {
             const art = await fetchArtwork(w.query);
@@ -793,22 +735,53 @@ function updatePreviewMaterials() {
   `).join('');
 }
 
-function updatePreviewVariation(key) {
+/* ---- Update the LIVE PREVIEW panel (real artwork image) ---- */
+let previewRequestId = 0;
+
+async function updatePreviewVariation(key) {
     const w = workshopByKey(key);
+    const media = $('#previewMedia');
+    const img = $('#previewImage');
+    const spinner = $('#previewSpinner');
+    const titleEl = $('#previewTitle');
+    const metaEl = $('#previewMeta');
 
     $('#previewWorkshop').textContent = w.name;
     $('#previewBlurb').textContent = w.blurb;
 
-    const bg = $('#previewHeroBg');
-    const icon = $('#previewHeroIcon');
+    if (!media || !img) return;
 
-    if (bg) bg.style.setProperty('--swatch', w.swatch);
-    if (icon) {
-        icon.innerHTML = variationIcon(w.key);
-        icon.style.animation = 'none';
-        void icon.offsetWidth;
-        icon.style.animation = '';
+    titleEl.textContent = 'Finding a work from the archive…';
+    metaEl.textContent = '';
+    img.classList.remove('is-ready');
+    media.classList.remove('is-error');
+    media.classList.add('is-loading');
+    if (spinner) spinner.style.display = 'block';
+
+    const reqId = ++previewRequestId;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            const art = await fetchArtwork(w.query);
+            if (reqId !== previewRequestId) return;
+
+            await loadInto(media, img, art.image, art.title);
+            if (reqId !== previewRequestId) return;
+
+            titleEl.textContent = art.title;
+            metaEl.textContent = art.credit;
+            if (spinner) spinner.style.display = 'none';
+            return;
+        } catch (err) {
+            console.warn(`Preview attempt ${attempt + 1} failed.`, err);
+            if (reqId !== previewRequestId) return;
+        }
     }
+
+    titleEl.textContent = 'Could not load a work';
+    metaEl.textContent = 'Please try another variation.';
+    media.classList.remove('is-loading');
+    if (spinner) spinner.style.display = 'none';
 }
 
 /* ---- Validation ---- */
@@ -903,7 +876,6 @@ async function handleSubmit(e) {
     submitBtn.classList.add('is-loading');
     submitBtn.disabled = true;
 
-    // Silently fetch a work for the email (no display)
     let artwork = { title: '', credit: '', image: '' };
     try {
         const art = await fetchArtwork(w.query);
@@ -1084,108 +1056,4 @@ function writeReminders(arr) {
 
 function saveReminder(p) {
     const arr = readReminders();
-    arr.push({
-        id: p.registrationId,
-        name: p.name,
-        email: p.email,
-        workshopKey: p.workshopKey,
-        workshopName: p.workshopName,
-        sessionDate: p.sessionDate,
-        sessionTime: p.sessionTime,
-        skillLevel: p.skillLevel,
-        repeat: p.repeat,
-        focus: p.focus,
-        materials: p.materials,
-        artworkTitle: p.artworkTitle,
-        artworkCredit: p.artworkCredit,
-        artworkImage: p.artworkImage,
-        createdAt: p.createdAt
-    });
-    writeReminders(arr);
-}
-
-function deleteReminder(id) {
-    writeReminders(readReminders().filter(r => r.id !== id));
-    renderDashboard();
-}
-
-function renderDashboard() {
-    const list = $('#reminderList');
-    const empty = $('#reminderEmpty');
-    const count = $('#reminderCount');
-    if (!list) return;
-
-    const reminders = readReminders().sort((a, b) => {
-        const da = new Date(`${a.sessionDate}T${a.sessionTime || '00:00'}`);
-        const db = new Date(`${b.sessionDate}T${b.sessionTime || '00:00'}`);
-        return da - db;
-    });
-
-    if (count) {
-        count.textContent = reminders.length === 1
-            ? '1 reminder'
-            : `${reminders.length} reminders`;
-    }
-
-    if (!reminders.length) {
-        list.innerHTML = '';
-        if (empty) empty.hidden = false;
-        return;
-    }
-
-    if (empty) empty.hidden = true;
-
-    list.innerHTML = reminders.map(r => {
-        const w = workshopByKey(r.workshopKey);
-        const thumb = r.artworkImage
-            ? `<img src="${escapeHtml(r.artworkImage)}" alt="" loading="lazy" onerror="this.style.display='none'">`
-            : '';
-
-        return `
-      <article class="reminder">
-        <div class="reminder__thumb" style="background:${w.swatch}">
-          <span class="reminder__badge">${escapeHtml(w.tag)}</span>
-          ${thumb}
-        </div>
-
-        <div class="reminder__body">
-          <p class="reminder__when">${escapeHtml(formatDateLong(r.sessionDate))} · ${escapeHtml(r.sessionTime || '')}</p>
-          <p class="reminder__what">${escapeHtml(r.workshopName)}</p>
-          <p class="reminder__art">${escapeHtml(r.artworkTitle || 'Work pending')}</p>
-
-          <div class="reminder__foot">
-            <span class="reminder__id">${escapeHtml(r.id)}</span>
-            <button class="reminder__del" type="button" data-delete="${escapeHtml(r.id)}">Remove</button>
-          </div>
-        </div>
-      </article>
-    `;
-    }).join('');
-
-    $$('[data-delete]', list).forEach(btn => {
-        btn.addEventListener('click', () => deleteReminder(btn.dataset.delete));
-    });
-}
-
-function formatDateLong(iso) {
-    if (!iso) return '';
-    const d = new Date(`${iso}T00:00:00`);
-    if (isNaN(d)) return iso;
-    return d.toLocaleDateString(undefined, {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
-}
-
-/* ============================================================
-   BOOT
-   ============================================================ */
-document.addEventListener('DOMContentLoaded', () => {
-    initNav();
-
-    const page = document.body.dataset.page;
-    if (page === 'home')     initHome();
-    if (page === 'schedule') initSchedule();
-});
+    arr.push

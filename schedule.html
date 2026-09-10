@@ -46,7 +46,8 @@
             <h1>Set a reminder</h1>
             <p class="lede lede--narrow">
                 Pick a variation and a moment. We'll send you one work from the open
-                archive — credited in full, with your own tailored materials list  for looking at it properly.
+                archive — credited in full, with your own tailored materials list and
+                prompts for looking at it properly.
             </p>
         </div>
     </section>
@@ -181,13 +182,21 @@
                     </div>
                 </div>
 
+                <!-- ============ LIVE PREVIEW ============ -->
                 <aside class="schedule-preview">
                     <div class="preview">
                         <p class="eyebrow">Live preview</p>
 
-                        <div class="preview__hero" id="previewHero">
-                            <div class="preview__hero-bg" id="previewHeroBg" aria-hidden="true"></div>
-                            <div class="preview__hero-icon" id="previewHeroIcon" aria-hidden="true"></div>
+                        <div class="frame frame--preview">
+                            <div class="frame__media is-loading" id="previewMedia">
+                                <img id="previewImage" alt="A work from the open archive that will be attached to your reminder" />
+                                <div class="spinner" id="previewSpinner" aria-hidden="true"></div>
+                            </div>
+                        </div>
+
+                        <div class="preview__credit">
+                            <p class="preview__title" id="previewTitle">Finding a work from the archive…</p>
+                            <p class="art-meta" id="previewMeta"></p>
                         </div>
 
                         <h2 class="preview__heading" id="previewWorkshop">Watercolor Landscapes</h2>
@@ -201,8 +210,7 @@
                         </div>
 
                         <p class="preview__note">
-                            A real work from the open archive will be attached to your reminder
-                            email — this preview shows the variation, not the work itself.
+                            A real work like this will be attached to your reminder email.
                         </p>
                     </div>
                 </aside>
