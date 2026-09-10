@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Long Look — A Personal Art Practice</title>
+    <meta name="description" content="A personal art study reminder. One work from the open archive, credited in full, on your schedule." />
+    <meta name="theme-color" content="#FAF8F5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="home">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+    <div class="wrap site-header__inner">
+        <a class="brand" href="index.html" aria-label="The Long Look — home">
+            <span class="brand__mark" aria-hidden="true">LL</span>
+            <span class="brand__text">
+          <strong>The Long Look</strong>
+          <small>A Personal Art Practice</small>
+        </span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+
+        <nav class="site-nav" id="siteNav" aria-label="Main navigation">
+            <a href="index.html" data-nav="home">Home</a>
+            <a href="about.html" data-nav="about">Why</a>
+            <a href="team.html" data-nav="team">Makers</a>
+            <a class="btn btn--primary btn--sm" href="schedule.html">Set a Reminder</a>
+        </nav>
+    </div>
+</header>
+
+<main id="main">
+
+    <section class="hero">
+        <div class="wrap hero__inner">
+            <div class="hero__copy">
+                <p class="eyebrow">A personal art practice &middot; one work at a time</p>
+                <h1>Look at art<br /><em>on purpose.</em></h1>
+                <p class="lede">
+                    The Long Look sends you a personal study reminder built around a real
+                    work from the open archive — on the date and at the time you choose.
+                    Pick a variation. Build your own practice. One work at a time.
+                </p>
+
+                <div class="hero__actions">
+                    <a class="btn btn--primary btn--lg" href="schedule.html">Set a Reminder</a>
+                    <a class="btn btn--ghost btn--lg" href="#variations">Browse Variations</a>
+                </div>
+
+                <ul class="hero__stats">
+                    <li><strong>6</strong><span>Personal variations</span></li>
+                    <li><strong>1</strong><span>Work per reminder</span></li>
+                    <li><strong>0</strong><span>Cost, always</span></li>
+                </ul>
+            </div>
+
+            <figure class="hero__art">
+                <div class="frame frame--hero">
+                    <div class="frame__media is-loading" id="heroMedia">
+                        <img id="heroImage" alt="A work from the open archive" />
+                    </div>
+                </div>
+                <figcaption class="art-caption" id="heroCaption">
+                    <span class="art-caption__title">Drawing a work from the archive…</span>
+                    <span class="art-caption__meta"></span>
+                </figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="wrap">
+            <div class="steps">
+                <article class="step">
+                    <span class="step__num">01</span>
+                    <h3>Choose a variation</h3>
+                    <p>Watercolor, portraiture, charcoal, abstract, print, or figure study — six personal practices, each pulling from a different corner of the open archive.</p>
+                </article>
+                <article class="step">
+                    <span class="step__num">02</span>
+                    <h3>Pick a date &amp; time</h3>
+                    <p>Tell us when you want to sit with a work. Morning, midnight, or next Tuesday at 4pm — your schedule, not ours.</p>
+                </article>
+                <article class="step">
+                    <span class="step__num">03</span>
+                    <h3>We email the work</h3>
+                    <p>At the moment you asked for, one work arrives with its image, its credit line, and prompts for looking at it properly.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="inspiration">
+        <div class="wrap">
+            <header class="section__head">
+                <p class="eyebrow">From the archive</p>
+                <h2>Today's Inspiration</h2>
+                <p class="section__sub">
+                    A randomly drawn work from the Art Institute of Chicago's open archive —
+                    the same source every personal reminder pulls from.
+                </p>
+            </header>
+
+            <div class="today">
+                <figure class="today__art">
+                    <div class="frame">
+                        <div class="frame__media is-loading" id="todayMedia">
+                            <img id="todayImage" alt="A randomly selected work from the archive" />
+                        </div>
+                    </div>
+                </figure>
+
+                <div class="today__meta">
+                    <p class="eyebrow" id="todayCredit">Art Institute of Chicago</p>
+                    <h3 id="todayTitle">Fetching a work…</h3>
+                    <p class="art-meta" id="todayMeta"></p>
+                    <p class="today__note">
+                        Every reminder you set carries one work like this, plus a short
+                        prompt so you're never staring at a page wondering what you're
+                        supposed to notice.
+                    </p>
+                    <div class="today__actions">
+                        <button class="btn btn--ghost" id="todayRefresh" type="button">
+                            <span class="btn__spin" aria-hidden="true"></span>
+                            Draw another work
+                        </button>
+                        <a class="btn btn--primary" href="schedule.html">Remind me of this</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--alt" id="variations">
+        <div class="wrap">
+            <header class="section__head section__head--center">
+                <p class="eyebrow">Six ways to look</p>
+                <h2>Personal Variations</h2>
+                <p class="section__sub">
+                    Each variation is a personal practice — a focus, a suggested sitting
+                    length, and a materials list you can tailor to your own setup.
+                </p>
+            </header>
+
+            <div class="workshop-grid" id="workshopGrid">
+                <!-- rendered by script.js -->
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="collection">
+        <div class="wrap collection">
+            <div class="collection__copy">
+                <p class="eyebrow">Your own study list</p>
+                <h2>Works you keep coming back to</h2>
+                <p>
+                    Every reminder you set is logged to a personal study list on this device.
+                    Over a few weeks you build a small, private collection of works you've
+                    actually sat with — not just scrolled past.
+                </p>
+                <ul class="checklist">
+                    <li>One work per reminder, credited in full</li>
+                    <li>A materials list tailored to your own setup</li>
+                    <li>Looking prompts to guide your study</li>
+                    <li>Send once, weekly, or fortnightly</li>
+                </ul>
+            </div>
+
+            <aside class="collection__card">
+                <p class="eyebrow">Ready when you are</p>
+                <h3>Set your first reminder</h3>
+                <p class="muted">
+                    It takes about forty seconds. No account, no password, no card.
+                    Just a name, an email, and a time.
+                </p>
+                <a class="btn btn--primary btn--block" href="schedule.html">Set a Reminder</a>
+                <a class="btn btn--ghost btn--block" href="about.html">Why we built this</a>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="wrap site-footer__inner">
+        <div class="site-footer__brand">
+            <p class="brand__text brand__text--footer"><strong>The Long Look</strong></p>
+            <p class="muted">A personal art practice, one work at a time.</p>
+        </div>
+        <div class="site-footer__links">
+            <a href="index.html">Home</a>
+            <a href="about.html">Why</a>
+            <a href="team.html">Makers</a>
+            <a href="schedule.html">Set a Reminder</a>
+        </div>
+        <p class="muted small">
+            Artwork imagery courtesy of the Art Institute of Chicago and the Cleveland Museum of Art.
+        </p>
+    </div>
+</footer>
+
+<div class="lightbox" id="lightbox" hidden>
+    <div class="lightbox__backdrop" data-close></div>
+
+    <div class="lightbox__panel" role="dialog" aria-modal="true" aria-labelledby="lbTitle">
+        <button class="lightbox__close" type="button" data-close aria-label="Close preview">&times;</button>
+
+        <div class="lightbox__frame">
+            <div class="spinner" id="lbSpinner" aria-hidden="true"></div>
+            <img id="lbImage" alt="" />
+        </div>
+
+        <div class="lightbox__meta">
+            <p class="eyebrow" id="lbWorkshop"></p>
+            <h3 id="lbTitle"></h3>
+            <p class="art-meta" id="lbMeta"></p>
+            <p class="lightbox__note">
+                This is the kind of work your reminders will draw from.
+            </p>
+            <a class="btn btn--primary" id="lbRegister" href="schedule.html">Set a reminder for this</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

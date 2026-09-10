@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Set a Reminder — The Long Look</title>
+    <meta name="description" content="Pick a variation and a moment. We'll send you one work from the open archive, credited in full." />
+    <meta name="theme-color" content="#FAF8F5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="schedule">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+    <div class="wrap site-header__inner">
+        <a class="brand" href="index.html" aria-label="The Long Look — home">
+            <span class="brand__mark" aria-hidden="true">LL</span>
+            <span class="brand__text">
+          <strong>The Long Look</strong>
+          <small>A Personal Art Practice</small>
+        </span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+
+        <nav class="site-nav" id="siteNav" aria-label="Main navigation">
+            <a href="index.html" data-nav="home">Home</a>
+            <a href="about.html" data-nav="about">Why</a>
+            <a href="team.html" data-nav="team">Makers</a>
+            <a class="btn btn--primary btn--sm" href="schedule.html">Set a Reminder</a>
+        </nav>
+    </div>
+</header>
+
+<main id="main">
+
+    <section class="page-hero page-hero--tight">
+        <div class="wrap">
+            <p class="eyebrow">Step one of one</p>
+            <h1>Set a reminder</h1>
+            <p class="lede lede--narrow">
+                Pick a variation and a moment. We'll send you one work from the open
+                archive — credited in full, with your own tailored materials list  for looking at it properly.
+            </p>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="wrap">
+            <div class="schedule-layout">
+
+                <div class="schedule-form-wrap">
+                    <form id="scheduleForm" class="card form" novalidate>
+
+                        <fieldset class="form__group">
+                            <legend class="form__legend">Who's it for</legend>
+
+                            <div class="field">
+                                <label for="fullName">Full Name <span class="req">*</span></label>
+                                <input type="text" id="fullName" name="fullName" autocomplete="name" required placeholder="Ana Villanueva" />
+                                <p class="field__error" data-error-for="fullName"></p>
+                            </div>
+
+                            <div class="field">
+                                <label for="email">Email Address <span class="req">*</span></label>
+                                <input type="email" id="email" name="email" autocomplete="email" required placeholder="ana@example.com" />
+                                <p class="field__error" data-error-for="email"></p>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="form__group">
+                            <legend class="form__legend">What to study</legend>
+
+                            <div class="field">
+                                <label for="workshop">Variation <span class="req">*</span></label>
+                                <select id="workshop" name="workshop" required>
+                                    <!-- populated by script.js -->
+                                </select>
+                                <p class="field__error" data-error-for="workshop"></p>
+                            </div>
+
+                            <div class="field">
+                                <label for="skillLevel">Your Level <span class="req">*</span></label>
+                                <select id="skillLevel" name="skillLevel" required>
+                                    <option value="">Select…</option>
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                                <p class="field__error" data-error-for="skillLevel"></p>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="form__group">
+                            <legend class="form__legend">Your setup</legend>
+                            <p class="form__hint">
+                                Keep the suggested materials, or uncheck anything you already own
+                                and add your own. The live preview and the reminder email will
+                                match exactly what's listed here.
+                            </p>
+
+                            <ul class="materials-editor" id="materialsEditor">
+                                <!-- rendered by script.js -->
+                            </ul>
+
+                            <div class="materials-add">
+                                <input
+                                        type="text"
+                                        id="customMaterialInput"
+                                        placeholder="Add your own — e.g. sable brush, size 4"
+                                        maxlength="80"
+                                        autocomplete="off"
+                                />
+                                <button type="button" class="btn btn--ghost btn--sm" id="addMaterialBtn">
+                                    <span aria-hidden="true">+</span> Add
+                                </button>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="form__group">
+                            <legend class="form__legend">When</legend>
+
+                            <div class="field-row">
+                                <div class="field">
+                                    <label for="sessionDate">Date <span class="req">*</span></label>
+                                    <input type="date" id="sessionDate" name="sessionDate" required />
+                                    <p class="field__error" data-error-for="sessionDate"></p>
+                                </div>
+
+                                <div class="field">
+                                    <label for="sessionTime">Time <span class="req">*</span></label>
+                                    <input type="time" id="sessionTime" name="sessionTime" value="09:00" required />
+                                    <p class="field__error" data-error-for="sessionTime"></p>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="repeat">Repeat</label>
+                                <select id="repeat" name="repeat">
+                                    <option value="once">Just once</option>
+                                    <option value="weekly">Every week</option>
+                                    <option value="fortnightly">Every two weeks</option>
+                                    <option value="monthly">Every month</option>
+                                </select>
+                            </div>
+                        </fieldset>
+
+                        <div class="field">
+                            <label for="accessibility">Accessibility Needs <span class="opt">(optional)</span></label>
+                            <textarea id="accessibility" name="accessibility" rows="3" placeholder="Large-print prompts, alt-text descriptions, quieter timing — anything that helps."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn--primary btn--block btn--lg" id="submitBtn">
+                            <span class="btn__label">Set My Reminder</span>
+                            <span class="btn__spin" aria-hidden="true"></span>
+                        </button>
+
+                        <p class="form__fine">
+                            No account needed. Your study list is stored only on this device.
+                        </p>
+                    </form>
+
+                    <div class="form-message" id="formMessage" role="status" aria-live="polite" hidden>
+                        <div class="form-message__icon" aria-hidden="true"></div>
+                        <div class="form-message__body">
+                            <h3 id="formMessageTitle"></h3>
+                            <p id="formMessageText"></p>
+                            <p class="form-message__id" id="registrationIdWrap" hidden>
+                                Reminder ID: <strong id="registrationId"></strong>
+                            </p>
+                            <div class="form-message__actions">
+                                <button type="button" class="btn btn--ghost btn--sm" id="resetFormBtn">Set another reminder</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="schedule-preview">
+                    <div class="preview">
+                        <p class="eyebrow">Live preview</p>
+
+                        <div class="preview__hero" id="previewHero">
+                            <div class="preview__hero-bg" id="previewHeroBg" aria-hidden="true"></div>
+                            <div class="preview__hero-icon" id="previewHeroIcon" aria-hidden="true"></div>
+                        </div>
+
+                        <h2 class="preview__heading" id="previewWorkshop">Watercolor Landscapes</h2>
+                        <p class="preview__sub" id="previewBlurb">
+                            Washes, wet-on-wet skies, and the discipline of leaving paper alone.
+                        </p>
+
+                        <div class="preview__materials">
+                            <p class="eyebrow">What's required</p>
+                            <ul class="checklist checklist--icon" id="previewMaterials"></ul>
+                        </div>
+
+                        <p class="preview__note">
+                            A real work from the open archive will be attached to your reminder
+                            email — this preview shows the variation, not the work itself.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--alt" id="dashboard">
+        <div class="wrap">
+            <header class="section__head section__head--split">
+                <div>
+                    <p class="eyebrow">Your study list</p>
+                    <h2>Upcoming reminders</h2>
+                    <p class="section__sub">
+                        Stored locally on this device. Nothing here is sent anywhere until
+                        you set it.
+                    </p>
+                </div>
+                <p class="dashboard-count" id="reminderCount">0 reminders</p>
+            </header>
+
+            <div class="dashboard" id="reminderList">
+                <!-- rendered by script.js -->
+            </div>
+
+            <div class="empty-state" id="reminderEmpty">
+                <span class="empty-state__icon" aria-hidden="true">◌</span>
+                <h3>No reminders yet</h3>
+                <p>Set your first one above and it will appear here.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="wrap site-footer__inner">
+        <div class="site-footer__brand">
+            <p class="brand__text brand__text--footer"><strong>The Long Look</strong></p>
+            <p class="muted">A personal art practice, one work at a time.</p>
+        </div>
+        <div class="site-footer__links">
+            <a href="index.html">Home</a>
+            <a href="about.html">Why</a>
+            <a href="team.html">Makers</a>
+            <a href="schedule.html">Set a Reminder</a>
+        </div>
+        <p class="muted small">
+            Artwork imagery courtesy of the Art Institute of Chicago and the Cleveland Museum of Art.
+        </p>
+    </div>
+</footer>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

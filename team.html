@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Makers — The Long Look</title>
+    <meta name="description" content="The Long Look is a student project built by two BSIT students from Lewis College, Sorsogon City." />
+    <meta name="theme-color" content="#FAF8F5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="team">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+    <div class="wrap site-header__inner">
+        <a class="brand" href="index.html" aria-label="The Long Look — home">
+            <span class="brand__mark" aria-hidden="true">LL</span>
+            <span class="brand__text">
+          <strong>The Long Look</strong>
+          <small>A Personal Art Practice</small>
+        </span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+
+        <nav class="site-nav" id="siteNav" aria-label="Main navigation">
+            <a href="index.html" data-nav="home">Home</a>
+            <a href="about.html" data-nav="about">Why</a>
+            <a href="team.html" data-nav="team">Makers</a>
+            <a class="btn btn--primary btn--sm" href="schedule.html">Set a Reminder</a>
+        </nav>
+    </div>
+</header>
+
+<main id="main">
+
+    <section class="page-hero">
+        <div class="wrap">
+            <p class="eyebrow">Two students, one small project</p>
+            <h1>The makers</h1>
+            <p class="lede lede--narrow">
+                The Long Look is a student project built by two BSIT students from
+                Lewis College, Sorsogon City. One builds the backend — the archive
+                pipeline, email delivery, and the reminder store. One builds the
+                frontend — the layout, the design system, and everything you actually
+                see and click.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="team-grid">
+
+                <!-- ============ MEMBER 1 — LUIGE ============ -->
+                <article class="member">
+                    <div class="member__photo">
+                        <span class="member__initials" aria-hidden="true">LD</span>
+                        <img src="images/team-1.jpg" alt="Portrait of Luige Dela Torre" onerror="this.remove()" />
+                    </div>
+
+                    <div class="member__body">
+                        <p class="eyebrow">Backend Developer</p>
+                        <h2>Luige Dela Torre</h2>
+                        <p class="member__role">BSIT &middot; Lewis College, Sorsogon City</p>
+
+                        <p>
+                            Luige builds the backend that turns a dropdown selection into a real
+                            work in your inbox. He's responsible for the open archive integration,
+                            the EmailJS delivery layer, the local reminder store, and the fact
+                            that nothing breaks when you schedule a reminder for midnight on a
+                            Sunday.
+                        </p>
+                        <p>
+                            He's the one who figured out how to filter out archive records with
+                            missing images, and who keeps the whole reminder pipeline running
+                            even when the network decides it doesn't want to cooperate.
+                        </p>
+
+                        <ul class="member__facts">
+                            <li><span>Focus</span><strong>APIs, email delivery, data</strong></li>
+                            <li><span>Programme</span><strong>BSIT, Lewis College</strong></li>
+                            <li><span>Stack</span><strong>JavaScript, Apps Script, EmailJS</strong></li>
+                            <li><span>Studio habit</span><strong>Charcoal, badly, nightly</strong></li>
+                        </ul>
+
+                        <div class="member__links">
+                            <a class="btn btn--ghost btn--sm" href="https://facebook.com/" target="_blank" rel="noopener">Facebook</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ============ MEMBER 2 — AUSTIN ============ -->
+                <article class="member">
+                    <div class="member__photo">
+                        <span class="member__initials" aria-hidden="true">AV</span>
+                        <img src="images/team-2.jpg" alt="Portrait of Austin Dominic Vallidolid" onerror="this.remove()" />
+                    </div>
+
+                    <div class="member__body">
+                        <p class="eyebrow">Frontend Developer</p>
+                        <h2>Austin Dominic Vallidolid</h2>
+                        <p class="member__role">BSIT &middot; Lewis College, Sorsogon City</p>
+
+                        <p>
+                            Austin builds everything you actually see and click — the layout,
+                            the colour system, the gallery-style frames, the responsive
+                            behaviour, and the little transitions that make the whole thing
+                            feel considered rather than assembled.
+                        </p>
+                        <p>
+                            He wrote the design tokens that keep the warm off-white, deep ink,
+                            and terracotta accent consistent across all four pages, and he's
+                            the reason the site still looks right on a phone at 360px wide.
+                        </p>
+
+                        <ul class="member__facts">
+                            <li><span>Focus</span><strong>UI, layout, design system</strong></li>
+                            <li><span>Programme</span><strong>BSIT, Lewis College</strong></li>
+                            <li><span>Stack</span><strong>HTML, CSS, vanilla JS</strong></li>
+                            <li><span>Studio habit</span><strong>Woodblock, linocut, relief</strong></li>
+                        </ul>
+
+                        <div class="member__links">
+                            <a class="btn btn--ghost btn--sm" href="https://facebook.com/" target="_blank" rel="noopener">Facebook</a>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="wrap">
+            <header class="section__head section__head--center">
+                <p class="eyebrow">How we split it</p>
+                <h2>Two halves, one loop</h2>
+                <p class="section__sub">
+                    Same programme, same campus, two very different halves of the same
+                    build. Luige makes it work. Austin makes it worth looking at.
+                </p>
+            </header>
+
+            <div class="split">
+                <div class="split__col">
+                    <h3>Luige makes it work</h3>
+                    <ul class="checklist">
+                        <li>Queries the open art archives (AIC + Cleveland)</li>
+                        <li>Filters out records with missing images</li>
+                        <li>Builds and sends the reminder email via EmailJS</li>
+                        <li>Stores your study list locally on your device</li>
+                        <li>Handles validation, error states, and retries</li>
+                    </ul>
+                </div>
+
+                <div class="split__col">
+                    <h3>Austin makes it look right</h3>
+                    <ul class="checklist">
+                        <li>Designs the gallery-style layout and frame system</li>
+                        <li>Builds the responsive grid from 360px up</li>
+                        <li>Writes the design tokens and hover states</li>
+                        <li>Handles the lightbox, dashboard cards, and transitions</li>
+                        <li>Keeps every page visually consistent</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="prose__grid">
+                <div>
+                    <p class="eyebrow">About the build</p>
+                    <h2>A student project with a real purpose</h2>
+                </div>
+                <div class="prose__body">
+                    <p>
+                        The Long Look started as a coursework project at Lewis College
+                        in Sorsogon City. The brief was open — build something on the web that
+                        uses a public API and does something genuinely useful with it.
+                    </p>
+                    <p>
+                        We picked the Art Institute of Chicago's open archive because it's
+                        free, keyless, and enormous — over a hundred thousand works, all
+                        properly credited. Then we built the smallest possible thing on top
+                        of it: a personal reminder that emails you one work, on your schedule,
+                        with a materials list and prompts for looking at it properly.
+                    </p>
+                    <p>
+                        Everything runs in the browser. No accounts, no servers to maintain,
+                        no tracking. Just two students, one open archive, and a small idea
+                        about paying attention.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-band">
+        <div class="wrap cta-band__inner">
+            <div>
+                <h2>Say hello.</h2>
+                <p class="muted">Questions, corrections, or a variation you'd like us to add.</p>
+            </div>
+            <div class="cta-band__actions">
+                <a class="btn btn--primary btn--lg" href="mailto:hello@thelonglook.org">hello@thelonglook.org</a>
+                <a class="btn btn--ghost btn--lg" href="schedule.html">Set a Reminder</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="wrap site-footer__inner">
+        <div class="site-footer__brand">
+            <p class="brand__text brand__text--footer"><strong>The Long Look</strong></p>
+            <p class="muted">A personal art practice, one work at a time.</p>
+        </div>
+        <div class="site-footer__links">
+            <a href="index.html">Home</a>
+            <a href="about.html">Why</a>
+            <a href="team.html">Makers</a>
+            <a href="schedule.html">Set a Reminder</a>
+        </div>
+        <p class="muted small">
+            Artwork imagery courtesy of the Art Institute of Chicago and the Cleveland Museum of Art.
+        </p>
+    </div>
+</footer>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
