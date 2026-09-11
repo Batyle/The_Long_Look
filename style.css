@@ -509,7 +509,6 @@ code {
 .checklist--sm li { font-size: .82rem; padding: 6px 0 6px 22px; }
 .checklist--sm li::before { top: 14px; width: 10px; }
 
-/* ---------- CHECKLIST WITH ICONS ---------- */
 .checklist--icon {
     list-style: none;
     margin: 0;
@@ -568,7 +567,6 @@ code {
     vertical-align: middle;
 }
 
-/* ---------- MATERIALS EDITOR (form) ---------- */
 .form__hint {
     font-size: .82rem;
     color: var(--muted);
@@ -694,7 +692,6 @@ code {
 
 .materials-add .btn { flex: 0 0 auto; padding: 11px 18px; }
 
-/* ---------- PAGE HERO ---------- */
 .page-hero {
     padding: clamp(52px, 7vw, 88px) 0 clamp(28px, 4vw, 48px);
     border-bottom: 1px solid var(--line);
@@ -1097,6 +1094,8 @@ code {
     display: flex; flex-direction: column;
     transition: transform .3s, box-shadow .3s;
     animation: slideUp .35s ease;
+    position: relative;
+    overflow: hidden;
 }
 .reminder:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
 
@@ -1118,7 +1117,7 @@ code {
     z-index: 2;
 }
 
-.reminder__body { padding: 20px 22px; flex: 1; display: flex; flex-direction: column; }
+.reminder__body { padding: 20px 22px 20px; flex: 1; display: flex; flex-direction: column; }
 .reminder__when {
     font-family: var(--serif);
     font-size: 1.05rem;
@@ -1129,27 +1128,116 @@ code {
     font-size: .82rem;
     color: var(--muted);
     font-style: italic;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     line-height: 1.5;
 }
+
 .reminder__foot {
-    margin-top: auto;
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: 12px;
-    padding-top: 14px;
+    padding: 12px 0 12px;
+    border-top: 1px dashed var(--line);
+    margin-top: auto;
+}
+.reminder__id { font-size: .68rem; color: var(--muted); letter-spacing: .05em; }
+.reminder__repeat {
+    font-size: .68rem;
+    color: var(--accent);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* ---------- REMINDER CARD — action buttons ---------- */
+.reminder__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 16px;
     border-top: 1px solid var(--line);
 }
-.reminder__id { font-size: .7rem; color: var(--muted); letter-spacing: .05em; }
-.reminder__del {
-    background: none; border: 0;
+
+.reminder__actions .btn {
+    flex: 1;
+    min-width: 0;
+    min-height: 40px;
     font-size: .74rem;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 4px 8px;
-    transition: color .2s;
-    letter-spacing: .04em;
+    padding: 9px 12px;
+    font-weight: 600;
+    letter-spacing: .035em;
 }
-.reminder__del:hover { color: var(--err); }
+
+.reminder__send {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    border-color: var(--accent-dark);
+    box-shadow: 0 8px 18px -13px rgba(138,96,78,.9);
+}
+
+.reminder__send::before {
+    content: "\2197";
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.reminder__send:hover {
+    box-shadow: 0 13px 24px -13px rgba(138,96,78,.95);
+}
+
+.reminder__remove {
+    color: var(--err);
+    border-color: rgba(155,44,44,.28);
+    background: #fffafa;
+}
+
+.reminder__remove::before {
+    content: "\00d7";
+    font-size: 1.15rem;
+    line-height: .7;
+}
+
+.reminder__remove:hover {
+    color: #fff;
+    border-color: var(--err);
+    background: var(--err);
+    box-shadow: 0 9px 18px -14px rgba(155,44,44,.85);
+}
+
+.reminder.is-sending {
+    opacity: .7;
+    pointer-events: none;
+}
+
+.reminder.is-sent {
+    border-color: var(--ok);
+    box-shadow: 0 0 0 1px var(--ok);
+}
+
+.reminder__sent-flash {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(47,107,69,.92);
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-style: italic;
+    letter-spacing: .04em;
+    z-index: 5;
+    animation: flashIn 1.8s ease forwards;
+    pointer-events: none;
+    text-align: center;
+    padding: 0 20px;
+}
+
+@keyframes flashIn {
+    0%   { opacity: 0; }
+    15%  { opacity: 1; }
+    75%  { opacity: 1; }
+    100% { opacity: 0; }
+}
 
 .empty-state {
     text-align: center;
@@ -1229,6 +1317,100 @@ code {
 .lightbox__meta { padding: 40px 34px; align-self: center; }
 .lightbox__meta h3 { font-style: italic; margin-bottom: .3em; }
 .lightbox__note { font-size: .88rem; color: var(--muted); margin: 18px 0 22px; }
+
+/* ============================================================
+   EDIT MODAL
+   ============================================================ */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+.modal[hidden] { display: none; }
+
+.modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(20,19,18,.72);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn .25s ease;
+}
+
+.modal__panel {
+    position: relative;
+    z-index: 2;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    max-width: 620px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp .3s ease;
+}
+
+.modal__close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    z-index: 5;
+    background: rgba(250,248,245,.9);
+    border: 1px solid var(--line);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .2s, transform .2s, color .2s;
+}
+.modal__close:hover {
+    background: var(--ink);
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+.modal__body {
+    padding: 36px 40px 32px;
+}
+
+.modal__body h2 {
+    margin-bottom: .35em;
+    font-size: 1.6rem;
+}
+
+.modal__sub {
+    font-size: .92rem;
+    color: var(--muted);
+    margin-bottom: 26px;
+    line-height: 1.6;
+}
+
+.modal__form .field { margin-bottom: 16px; }
+.modal__form .field-row { margin-bottom: 16px; }
+
+.modal__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 22px;
+    margin-top: 22px;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 620px) {
+    .modal { padding: 0; place-items: stretch; }
+    .modal__panel { max-height: 100vh; border: 0; }
+    .modal__body { padding: 30px 22px 26px; }
+    .modal__actions { flex-direction: column-reverse; }
+    .modal__actions .btn { width: 100%; }
+}
 
 .site-footer {
     background: var(--bg-alt);
@@ -1317,6 +1499,9 @@ code {
 
     .materials-add { flex-direction: column; }
     .materials-add .btn { width: 100%; }
+
+    .reminder__actions { flex-wrap: nowrap; }
+    .reminder__actions .btn { font-size: .68rem; padding: 6px 8px; }
 }
 
 @media (max-width: 420px) {

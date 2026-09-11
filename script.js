@@ -15,10 +15,13 @@ const FIELDS     = 'id,title,image_id,artist_display,date_display,medium_display
    templateId  — get this from EmailJS → Email Templates
 -------------------------------- */
 const EMAILJS = {
-    publicKey:  'cIeRGuB2mD_8X6NQD',
-    serviceId:  'YOUR_SERVICE_ID',
-    templateId: 'YOUR_TEMPLATE_ID'
+    publicKey:  'ltI55387fZQ7ayUP-',
+    serviceId:  'service_elaz9hc',
+    templateId: 'template_w5znqv5'
 };
+
+/* Google Apps Script web app that stores and schedules reminders. */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXD0Ws2cryNPc2thkaptVZwkUxTz9rlrsw4ebUZX-TvavhyFuNejzLvrmzRHsbOYuZ/exec';
 
 /* Initialise EmailJS once, as soon as the library loads */
 (function initEmailJS() {
@@ -917,7 +920,10 @@ async function handleSubmit(e) {
     };
 
     try {
-        await sendReminderEmail(payload);
+        await Promise.all([
+            scheduleReminder(payload),
+            sendReminderEmail(payload)
+        ]);
         saveReminder(payload);
         renderDashboard();
         showSuccess(payload);
@@ -941,6 +947,24 @@ async function handleSubmit(e) {
     }
 }
 
+/*
+ * Apps Script web apps do not return CORS headers by default. `no-cors` lets
+ * the browser deliver the JSON payload without exposing its response. The
+ * reminder is then handled by doPost in the deployed Apps Script project.
+ */
+async function postToAppsScript(data) {
+    await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(data)
+    });
+}
+
+async function scheduleReminder(payload) {
+    await postToAppsScript({ action: 'schedule', ...payload });
+}
+
 async function sendReminderEmail(p) {
     const configured =
         window.emailjs &&
@@ -958,6 +982,8 @@ async function sendReminderEmail(p) {
     }
 
     const templateParams = {
+        title:            `Reminder confirmed: ${p.workshopName}`,
+        name:             p.name,
         to_name:          p.name,
         to_email:         p.email,
         registration_id:  p.registrationId,
@@ -976,16 +1002,9 @@ async function sendReminderEmail(p) {
         message:          buildPlainMessage(p)
     };
 
-    try {
-        return await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, templateParams, {
-            publicKey: EMAILJS.publicKey
-        });
-    } catch (err) {
-        if (err && (err.status === 0 || err.text === 'OK' || !err.status)) {
-            return { status: 'assumed-success' };
-        }
-        throw err;
-    }
+    return emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, templateParams, {
+        publicKey: EMAILJS.publicKey
+    });
 }
 
 function buildPlainMessage(p) {
@@ -1029,7 +1048,7 @@ function showSuccess(p) {
     text.textContent =
         `Your ${p.workshopName.toLowerCase()} study is scheduled for ` +
         `${formatDateLong(p.sessionDate)} at ${p.sessionTime}. ` +
-        `The work, your materials list, and the looking prompts are on their way to ${p.email}.`;
+        `The work, your materials list, and the looking prompts will be sent to ${p.email}.`;
     idEl.textContent = p.registrationId;
     idWrap.hidden = false;
     box.hidden = false;
@@ -1091,8 +1110,52 @@ function saveReminder(p) {
 }
 
 function deleteReminder(id) {
+    // Keep the scheduler and the local dashboard in sync.
+    postToAppsScript({ action: 'delete', registrationId: id })
+        .catch(err => console.warn('Could not remove the scheduled reminder.', err));
     writeReminders(readReminders().filter(r => r.id !== id));
     renderDashboard();
+}
+
+function reminderPayload(reminder) {
+    return {
+        registrationId: reminder.id,
+        name: reminder.name,
+        email: reminder.email,
+        workshopKey: reminder.workshopKey,
+        workshopName: reminder.workshopName,
+        sessionDate: reminder.sessionDate,
+        sessionTime: reminder.sessionTime,
+        skillLevel: reminder.skillLevel,
+        repeat: reminder.repeat,
+        focus: reminder.focus,
+        duration: workshopByKey(reminder.workshopKey).duration,
+        materials: reminder.materials || [],
+        artworkTitle: reminder.artworkTitle,
+        artworkCredit: reminder.artworkCredit,
+        artworkImage: reminder.artworkImage
+    };
+}
+
+async function sendReminderNow(reminder, card) {
+    card.classList.add('is-sending');
+    try {
+        await sendReminderEmail(reminderPayload(reminder));
+        card.classList.remove('is-sending');
+        card.classList.add('is-sent');
+        const flash = document.createElement('div');
+        flash.className = 'reminder__sent-flash';
+        flash.textContent = 'Reminder sent now';
+        card.appendChild(flash);
+        window.setTimeout(() => {
+            flash.remove();
+            card.classList.remove('is-sent');
+        }, 1800);
+    } catch (err) {
+        console.error('Could not send the reminder now.', err);
+        card.classList.remove('is-sending');
+        window.alert('We could not send this reminder. Please check your connection and try again.');
+    }
 }
 
 function renderDashboard() {
@@ -1141,7 +1204,11 @@ function renderDashboard() {
 
           <div class="reminder__foot">
             <span class="reminder__id">${escapeHtml(r.id)}</span>
-            <button class="reminder__del" type="button" data-delete="${escapeHtml(r.id)}">Remove</button>
+            <span class="reminder__repeat">${escapeHtml(r.repeat || 'once')}</span>
+          </div>
+          <div class="reminder__actions">
+            <button class="btn btn--primary btn--sm reminder__send" type="button" data-send="${escapeHtml(r.id)}">Remind me now</button>
+            <button class="btn btn--ghost btn--sm reminder__remove" type="button" data-delete="${escapeHtml(r.id)}">Remove</button>
           </div>
         </div>
       </article>
@@ -1149,7 +1216,19 @@ function renderDashboard() {
     }).join('');
 
     $$('[data-delete]', list).forEach(btn => {
-        btn.addEventListener('click', () => deleteReminder(btn.dataset.delete));
+        btn.addEventListener('click', () => {
+            if (window.confirm('Remove this reminder from your study list and scheduler?')) {
+                deleteReminder(btn.dataset.delete);
+            }
+        });
+    });
+
+    $$('[data-send]', list).forEach(btn => {
+        btn.addEventListener('click', () => {
+            const reminder = reminders.find(r => r.id === btn.dataset.send);
+            const card = btn.closest('.reminder');
+            if (reminder && card) sendReminderNow(reminder, card);
+        });
     });
 }
 

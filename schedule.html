@@ -182,7 +182,6 @@
                     </div>
                 </div>
 
-                <!-- ============ LIVE PREVIEW ============ -->
                 <aside class="schedule-preview">
                     <div class="preview">
                         <p class="eyebrow">Live preview</p>
@@ -225,8 +224,8 @@
                     <p class="eyebrow">Your study list</p>
                     <h2>Upcoming reminders</h2>
                     <p class="section__sub">
-                        Stored locally on this device. Nothing here is sent anywhere until
-                        you set it.
+                        Send one now, edit the details, or remove it entirely. Changes sync
+                        to the scheduler automatically.
                     </p>
                 </div>
                 <p class="dashboard-count" id="reminderCount">0 reminders</p>
@@ -262,6 +261,90 @@
         </p>
     </div>
 </footer>
+
+<!-- ================= EDIT REMINDER MODAL ================= -->
+<div class="modal" id="editModal" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+        <button class="modal__close" type="button" data-close-modal aria-label="Close">&times;</button>
+
+        <div class="modal__body">
+            <p class="eyebrow">Edit reminder</p>
+            <h2 id="editModalTitle">Update your reminder</h2>
+            <p class="modal__sub">
+                Change any detail below. Saving re-registers the reminder with the
+                scheduler and refreshes your study list.
+            </p>
+
+            <form id="editForm" class="modal__form" novalidate>
+                <input type="hidden" id="editId" />
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="editName">Full Name</label>
+                        <input type="text" id="editName" required />
+                    </div>
+                    <div class="field">
+                        <label for="editEmail">Email Address</label>
+                        <input type="email" id="editEmail" required />
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="editWorkshop">Variation</label>
+                        <select id="editWorkshop" required></select>
+                    </div>
+                    <div class="field">
+                        <label for="editSkill">Level</label>
+                        <select id="editSkill" required>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="editDate">Date</label>
+                        <input type="date" id="editDate" required />
+                    </div>
+                    <div class="field">
+                        <label for="editTime">Time</label>
+                        <input type="time" id="editTime" required />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="editRepeat">Repeat</label>
+                    <select id="editRepeat">
+                        <option value="once">Just once</option>
+                        <option value="weekly">Every week</option>
+                        <option value="fortnightly">Every two weeks</option>
+                        <option value="monthly">Every month</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="editMaterials">Materials <span class="opt">(one per line)</span></label>
+                    <textarea id="editMaterials" rows="6" placeholder="One item per line"></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="editAccessibility">Accessibility Needs <span class="opt">(optional)</span></label>
+                    <textarea id="editAccessibility" rows="2"></textarea>
+                </div>
+
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--ghost" data-close-modal>Cancel</button>
+                    <button type="submit" class="btn btn--primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="script.js"></script>
